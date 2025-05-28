@@ -1,47 +1,60 @@
-/*
-Copyright 2025.
-
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-    http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
-
 package v1alpha1
 
 import (
 	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 )
 
-// EDIT THIS FILE!  THIS IS SCAFFOLDING FOR YOU TO OWN!
-// NOTE: json tags are required.  Any new fields you add must have json tags for the fields to be serialized.
+// Action defines the possible actions the Cleaner can take on resources.
+type Action string
 
-// MyKindSpec defines the desired state of MyKind.
+const (
+	// Delete is the default action to remove unused resources.
+	Delete Action = "Delete"
+	// Update is an optional action to patch or label resources.
+	Update Action = "Update"
+)
+
+// MyKindSpec defines the desired state of MyKind
 type MyKindSpec struct {
-	// INSERT ADDITIONAL SPEC FIELDS - desired state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// Criteria defines the conditions under which a resource is considered unused or unhealthy.
+	Criteria string `json:"criteria"`
 
-	// Foo is an example field of MyKind. Edit mykind_types.go to remove/update
-	Foo string `json:"foo,omitempty"`
+	// Schedule defines how often the controller should scan the cluster for matching resources.
+	Schedule string `json:"schedule"`
+
+	// +kubebuilder:default:=Delete
+	// Action to take on the resources matching the criteria. Defaults to Delete.
+	Action Action `json:"action,omitempty"`
+
+	// +optional
+	// Transform specifies an optional mutation to apply (e.g., label, annotation).
+	Transform string `json:"transform,omitempty"`
+
+	// +optional
+	// Namespaces allows filtering the scan to specific namespaces.
+	Namespaces []string `json:"namespaces,omitempty"`
 }
 
-// MyKindStatus defines the observed state of MyKind.
+// MyKindStatus defines the observed state of MyKind
 type MyKindStatus struct {
-	// INSERT ADDITIONAL STATUS FIELD - define observed state of cluster
-	// Important: Run "make" to regenerate code after modifying this file
+	// +optional
+	// LastRunTime is the timestamp of the most recent cleaner run.
+	LastRunTime *metav1.Time `json:"lastRunTime,omitempty"`
+
+	// +optional
+	// NextScheduleTime is when the next run is scheduled.
+	NextScheduleTime *metav1.Time `json:"nextScheduleTime,omitempty"`
+
+	// +optional
+	// FailureMessage captures any error from the last run.
+	FailureMessage string `json:"failureMessage,omitempty"`
 }
 
-// +kubebuilder:object:root=true
-// +kubebuilder:subresource:status
+//+kubebuilder:object:root=true
+//+kubebuilder:subresource:status
+//+kubebuilder:resource:path=mykinds,scope=Cluster
 
-// MyKind is the Schema for the mykinds API.
+// MyKind is the Schema for the mykinds API
 type MyKind struct {
 	metav1.TypeMeta   `json:",inline"`
 	metav1.ObjectMeta `json:"metadata,omitempty"`
@@ -50,9 +63,9 @@ type MyKind struct {
 	Status MyKindStatus `json:"status,omitempty"`
 }
 
-// +kubebuilder:object:root=true
+//+kubebuilder:object:root=true
 
-// MyKindList contains a list of MyKind.
+// MyKindList contains a list of MyKind
 type MyKindList struct {
 	metav1.TypeMeta `json:",inline"`
 	metav1.ListMeta `json:"metadata,omitempty"`
@@ -62,3 +75,4 @@ type MyKindList struct {
 func init() {
 	SchemeBuilder.Register(&MyKind{}, &MyKindList{})
 }
+
