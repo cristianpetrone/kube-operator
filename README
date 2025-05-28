@@ -3,3 +3,9 @@
 go mod init github.com/auberon/kube-operator
 kubebuilder init --domain projectsveltos.io
 kubebuilder create api --group app --version v1alpha1 --kind MyKind
+
+
+#Dop aver modificato il file go della struct
+
+mage generate
+make manifests
