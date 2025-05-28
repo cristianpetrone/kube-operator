@@ -1,0 +1,88 @@
+---
+apiVersion: apiextensions.k8s.io/v1
+kind: CustomResourceDefinition
+metadata:
+  annotations:
+    controller-gen.kubebuilder.io/version: v0.18.0
+  name: mykinds.app.projectsveltos.io
+spec:
+  group: app.projectsveltos.io
+  names:
+    kind: MyKind
+    listKind: MyKindList
+    plural: mykinds
+    singular: mykind
+  scope: Cluster
+  versions:
+  - name: v1alpha1
+    schema:
+      openAPIV3Schema:
+        description: MyKind is the Schema for the mykinds API
+        properties:
+          apiVersion:
+            description: |-
+              APIVersion defines the versioned schema of this representation of an object.
+              Servers should convert recognized schemas to the latest internal value, and
+              may reject unrecognized values.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#resources
+            type: string
+          kind:
+            description: |-
+              Kind is a string value representing the REST resource this object represents.
+              Servers may infer this from the endpoint the client submits requests to.
+              Cannot be updated.
+              In CamelCase.
+              More info: https://git.k8s.io/community/contributors/devel/sig-architecture/api-conventions.md#types-kinds
+            type: string
+          metadata:
+            type: object
+          spec:
+            description: MyKindSpec defines the desired state of MyKind
+            properties:
+              action:
+                default: Delete
+                description: Action to take on the resources matching the criteria.
+                  Defaults to Delete.
+                type: string
+              criteria:
+                description: Criteria defines the conditions under which a resource
+                  is considered unused or unhealthy.
+                type: string
+              namespaces:
+                description: Namespaces allows filtering the scan to specific namespaces.
+                items:
+                  type: string
+                type: array
+              schedule:
+                description: Schedule defines how often the controller should scan
+                  the cluster for matching resources.
+                type: string
+              transform:
+                description: Transform specifies an optional mutation to apply (e.g.,
+                  label, annotation).
+                type: string
+            required:
+            - criteria
+            - schedule
+            type: object
+          status:
+            description: MyKindStatus defines the observed state of MyKind
+            properties:
+              failureMessage:
+                description: FailureMessage captures any error from the last run.
+                type: string
+              lastRunTime:
+                description: LastRunTime is the timestamp of the most recent cleaner
+                  run.
+                format: date-time
+                type: string
+              nextScheduleTime:
+                description: NextScheduleTime is when the next run is scheduled.
+                format: date-time
+                type: string
+            type: object
+        type: object
+    served: true
+    storage: true
+    subresources:
+      status: {}
