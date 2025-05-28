@@ -1,0 +1,5 @@
+#Lista di comandi per inizializzare il progetto
+
+go mod init github.com/auberon/kube-operator
+kubebuilder init --domain projectsveltos.io
+kubebuilder create api --group app --version v1alpha1 --kind MyKind
