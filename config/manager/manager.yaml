@@ -63,8 +63,9 @@ spec:
         args:
           - --leader-elect
           - --health-probe-bind-address=:8081
-        image: controller:latest
+        image: my-operator:latest
         name: manager
+        imagePullPolicy: Never # Serve per non far pullare dalla rete, ma prendere in locale l'immagine
         ports: []
         securityContext:
           allowPrivilegeEscalation: false

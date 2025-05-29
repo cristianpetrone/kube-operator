@@ -61,6 +61,32 @@ vet: ## Run go vet against code.
 test: manifests generate fmt vet setup-envtest ## Run tests.
 	KUBEBUILDER_ASSETS="$(shell $(ENVTEST) use $(ENVTEST_K8S_VERSION) --bin-dir $(LOCALBIN) -p path)" go test $$(go list ./... | grep -v /e2e) -coverprofile cover.out
 
+.PHONY: docker-build
+docker-build: ## Build the docker image locally
+	eval $(minikube docker-env)
+	$(CONTAINER_TOOL) build -t $(IMG) .
+
+.PHONY: docker-build-minikube
+docker-build: ## Build the docker image locally
+        $(CONTAINER_TOOL) build -t $(IMG) .
+
+.PHONY: docker-push
+docker-push: ## Push the docker image to registry
+	$(CONTAINER_TOOL) push $(IMG)
+
+.PHONY: deploy
+deploy: manifests ## Deploy CRDs and manager deployment to the cluster
+	kubectl apply -f config/crd/bases
+	kubectl apply -k config/manager
+	kubectl apply -f config/rbac
+	kubectl apply -f config/samples/app_v1alpha1_mykind.yaml
+
+.PHONY: undeploy
+undeploy: ## Delete operator deployment and CRDs from cluster
+	kubectl delete -k config/manager || true
+	kubectl delete -f config/crd/bases || true
+	kubectl delete -f config/crd/rbac || true
+
 # TODO(user): To use a different vendor for e2e tests, modify the setup under 'tests/e2e'.
 # The default setup assumes Kind is pre-installed and builds/loads the Manager Docker image locally.
 # CertManager is installed by default; skip with:

@@ -75,4 +75,3 @@ type MyKindList struct {
 func init() {
 	SchemeBuilder.Register(&MyKind{}, &MyKindList{})
 }
-

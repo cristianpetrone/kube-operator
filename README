@@ -9,3 +9,31 @@ kubebuilder create api --group app --version v1alpha1 --kind MyKind
 
 mage generate
 make manifests
+
+in config/crd/bases/app.projectsveltos.io_mykinds.yaml c'é lo yaml che puó essere applicato al cluster
+
+#Per minikube
+kubectl get-context
+kubectl config use-context minikube
+minikube status
+minikube update-context
+
+
+#Buildare la docker image 
+eval $(minikube docker-env)   # Point your shell’s docker client to minikube’s docker daemon
+docker build -t my-operator:latest .
+
+#aggiornare il manager.yaml
+
+spec:
+  containers:
+  - name: manager
+    image: my-operator:latest
+    ...
+
+
+#Installare il CRDs nel cluster
+kubectl apply -f config/crd/bases/
+
+#Deployare l'operator
+kubectl apply -f config/manager/manager.yaml
